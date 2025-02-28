@@ -16,17 +16,23 @@ class LocationManager(private val context: Context) {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED
         ) {
-            Log.e("DEBUG", "Standort-Berechtigung fehlt!")
+            Log.e("DEBUG", "Standort-Berechtigung fehlt!") // ChatGPT
             return
         }
 
         fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
             .addOnSuccessListener { location ->
                 if (location != null) {
-                    Log.d("DEBUG", "📍 Standort erhalten: Lat=${location.latitude}, Lon=${location.longitude}")
+                    Log.d(
+                        "DEBUG",
+                        "📍 Standort erhalten: Lat=${location.latitude}, Lon=${location.longitude}"
+                    ) //ChatGPT
                     callback(location.latitude, location.longitude)
                 } else {
-                    Log.e("DEBUG", "Kein Standort verfügbar, Standardwert wird genutzt!")
+                    Log.e(
+                        "DEBUG",
+                        "Kein Standort verfügbar, Standardwert wird genutzt!"
+                    ) //ChatGPT generiert
                     callback(47.3769, 8.5417) // Standardwert: Zürich
                 }
             }

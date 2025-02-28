@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 
+//ChatGPT überarbeitet / bzw. Hilfe gebraucht
+
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "parkingDB", null, 1) {
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
@@ -22,7 +24,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "parkingDB", 
         onCreate(db)
     }
 
-    // **Speichert einen Parkplatz in die DB**
     fun saveParkingLocation(latitude: Double, longitude: Double, date: String) {
         val db = writableDatabase
         val values = ContentValues().apply {
@@ -34,19 +35,24 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "parkingDB", 
         db.close()
 
         if (result == -1L) {
-            Log.e("DEBUG", "❌ Fehler beim Speichern des Parkplatzes!")
+            Log.e("DEBUG", "❌ Fehler beim Speichern des Parkplatzes!") // ChatGPT generiert
         } else {
-            Log.d("DEBUG", "✅ Parkplatz gespeichert: Lat=$latitude, Lon=$longitude am $date")
+            Log.d(
+                "DEBUG",
+                "✅ Parkplatz gespeichert: Lat=$latitude, Lon=$longitude am $date"
+            ) // ChatGPT generiert
         }
     }
 
-    // **Gibt alle gespeicherten Parkplätze zurück**
     fun getParkingHistory(): List<Triple<Double, Double, String>> {
         val db = readableDatabase
         val cursor = db.rawQuery("SELECT * FROM ParkingLocations ORDER BY id DESC", null)
         val list = mutableListOf<Triple<Double, Double, String>>()
 
-        Log.d("DEBUG", "📂 Starte Datenbankabfrage für gespeicherte Parkplätze...")
+        Log.d(
+            "DEBUG",
+            "📂 Starte Datenbankabfrage für gespeicherte Parkplätze..."
+        ) //CahtGPT generiert
 
         while (cursor.moveToNext()) {
             val lat = cursor.getDouble(1)
@@ -54,13 +60,16 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "parkingDB", 
             val date = cursor.getString(3)
             list.add(Triple(lat, lon, date))
 
-            Log.d("DEBUG", "✅ Parkplatz geladen: $date - Lat=$lat, Lon=$lon") // **Jeder Eintrag wird geloggt**
+            Log.d("DEBUG", "✅ Parkplatz geladen: $date - Lat=$lat, Lon=$lon") // ChatGPT generiert
         }
 
         cursor.close()
         db.close()
 
-        Log.d("DEBUG", "🗂️ Gesamtanzahl gespeicherter Parkplätze: ${list.size}") // **Log für Anzahl der Einträge**
+        Log.d(
+            "DEBUG",
+            "🗂️ Gesamtanzahl gespeicherter Parkplätze: ${list.size}"
+        ) // ChatGPT generiert
 
         return list
     }

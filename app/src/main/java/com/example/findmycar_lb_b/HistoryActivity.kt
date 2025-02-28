@@ -21,12 +21,11 @@ class HistoryActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val dbHelper = DatabaseHelper(this)
-        val parkingHistory = dbHelper.getParkingHistory() // 🚀 Parkplätze aus der DB holen
+        val parkingHistory = dbHelper.getParkingHistory()
 
         Log.d(
-            "DEBUG", "🛠️ Anzahl Parkplätze aus DB: ${parkingHistory.size}"
-        ) // **Neuer Log für Debugging**
-
+            "DEBUG", "🛠️ Anzahl Parkplätze aus DB: ${parkingHistory.size}" //Chatgpt generiert
+        )
         setContent {
             ParkingHistoryScreen(parkingHistory) { latitude, longitude ->
                 openGoogleMaps(latitude, longitude)
@@ -53,7 +52,7 @@ fun ParkingHistoryScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "📜 Gespeicherte Parkplätze", style = MaterialTheme.typography.headlineMedium)
+        Text(text = "Gespeicherte Parkplätze", style = MaterialTheme.typography.headlineMedium)
 
         if (history.isEmpty()) {
             Text(text = "Keine gespeicherten Parkplätze.", modifier = Modifier.padding(top = 20.dp))

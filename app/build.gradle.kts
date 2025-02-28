@@ -8,6 +8,13 @@ android {
     namespace = "com.example.findmycar_lb_b"
     compileSdk = 35
 
+    lint {
+        checkReleaseBuilds = true
+        abortOnError = false
+        textReport = true
+        textOutput = file("$buildDir/reports/lint-results.txt")
+    }
+
     defaultConfig {
         applicationId = "com.example.findmycar_lb_b"
         minSdk = 28
@@ -40,9 +47,9 @@ android {
 }
 
 dependencies {
-    implementation("org.osmdroid:osmdroid-android:6.1.11") //kopiert
-    implementation("androidx.compose.material3:material3:1.1.1") //kopiert
-    implementation("com.google.code.gson:gson:2.10.1") //kopiert
+    implementation("org.osmdroid:osmdroid-android:6.1.11")
+    implementation("androidx.compose.material3:material3:1.1.1")
+    implementation("com.google.code.gson:gson:2.10.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -31,40 +32,35 @@ fun OpenStreetMapView(
     var parkingHistory by remember { mutableStateOf(emptyList<Triple<Double, Double, String>>()) } // Datenliste
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // 🌍 MapView
-        AndroidView(
-            factory = { context ->
-                MapView(context).apply {
-                    setTileSource(TileSourceFactory.MAPNIK)
-                    setMultiTouchControls(true)
-                    controller.setZoom(15.0)
+        AndroidView(factory = { context ->
+            MapView(context).apply {
+                setTileSource(TileSourceFactory.MAPNIK)
+                setMultiTouchControls(true)
+                controller.setZoom(15.0)
 
-                    currentLocation?.let {
-                        controller.setCenter(it)
-                    }
-
-                    mapView = this
+                currentLocation?.let {
+                    controller.setCenter(it)
                 }
-            },
-            modifier = Modifier.fillMaxSize(),
-            update = { map ->
-                currentLocation?.let { location ->
-                    map.controller.setCenter(location)
-                    map.overlays.clear() // Entfernt alte Marker, damit sich keine duplizieren
 
-                    val marker = Marker(map).apply {
-                        position = location
-                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        title = "📍 Mein Standort"
-                    }
-                    map.overlays.add(marker) // Füge den Marker hinzu
-                    map.invalidate() // Map neu laden
-                }
+                mapView = this
             }
+        }, modifier = Modifier.fillMaxSize(), update = { map ->
+            currentLocation?.let { location ->
+                map.controller.setCenter(location)
+                map.overlays.clear()
+
+                val marker = Marker(map).apply {
+                    position = location
+                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                    title = "aktueller Standort"
+                }
+                map.overlays.add(marker)
+                map.invalidate()
+            }
+        }
 
         )
 
-        // 📌 Buttons in einer Spalte über der Map platzieren
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -72,64 +68,71 @@ fun OpenStreetMapView(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 📍 Parkplatz speichern Button
             Button(
                 onClick = {
                     currentLocation?.let {
                         onSaveParking(it.latitude, it.longitude)
                     }
-                },
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.padding(8.dp)
+                }, shape = RoundedCornerShape(12.dp), modifier = Modifier.padding(8.dp)
             ) {
                 Text(text = "📍 Parkplatz speichern")
             }
+            val context = LocalContext.current
             Button(
                 onClick = {
                     currentLocation?.let {
-                        Log.d("DEBUG", "✅ Button wurde gedrückt, Standort: ${it.latitude}, ${it.longitude}") // 🔥 TEST
-                        navigationManager.openGoogleMaps(it.latitude, it.longitude)
-                    } ?: Log.e("DEBUG", "❌ currentLocation ist NULL!") // 🔥 TEST
-                },
-                modifier = Modifier
-                    .padding(8.dp)
-                    .background(Color.White, shape = RoundedCornerShape(8.dp))
+                        Log.d(
+                            "DEBUG",
+                            "✅ Button wurde gedrückt, Standort: ${it.latitude}, ${it.longitude}"
+                        ) // ChatGPt
+                        navigationManager.openGoogleMaps(it.latitude, it.longitude, context)
+                    } ?: Log.e("DEBUG", "❌ currentLocation ist NULL!") // Chatgpt
+                }, modifier = Modifier.padding(8.dp)
             ) {
                 Text("🌍 In Google Maps öffnen")
             }
 
-            // 📜 Verlauf anzeigen Button
             Button(
                 onClick = {
                     isHistoryExpanded = !isHistoryExpanded
                     if (isHistoryExpanded) {
                         parkingHistory = databaseHelper.getParkingHistory()
-                        Log.d("DEBUG", "🛠️ Verlauf geöffnet, Anzahl Parkplätze: ${parkingHistory.size}")
+                        Log.d(
+                            "DEBUG",
+                            "🛠️ Verlauf geöffnet, Anzahl Parkplätze: ${parkingHistory.size}"
+                        ) //ChatGPT
                     }
-                },
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.padding(8.dp)
+                }, shape = RoundedCornerShape(12.dp), modifier = Modifier.padding(8.dp)
             ) {
                 Text(text = if (isHistoryExpanded) "🔽 Verlauf ausblenden" else "📜 Verlauf ansehen")
             }
         }
 
-        // 📝 Popup für gespeicherte Parkplätze
         if (isHistoryExpanded) {
+            //hilfe von CHatgpt
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp) // Popup Höhe
+                    .height(300.dp)
                     .align(Alignment.BottomCenter)
                     .padding(8.dp)
+                    .background(color = Color.Gray)
             ) {
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(16.dp)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
                 ) {
-                    Text(text = "📜 Gespeicherte Parkplätze", style = MaterialTheme.typography.headlineMedium)
+                    Text(
+                        text = "📜 Gespeicherte Parkplätze",
+                        style = MaterialTheme.typography.headlineMedium
+                    )
 
                     if (parkingHistory.isEmpty()) {
-                        Text(text = "Keine gespeicherten Parkplätze.", modifier = Modifier.padding(top = 20.dp))
+                        Text(
+                            text = "Keine gespeicherten Parkplätze.",
+                            modifier = Modifier.padding(top = 20.dp)
+                        )
                     } else {
                         parkingHistory.forEach { (lat, lon, date) ->
                             Text(text = "📍 $date - Lat: $lat, Lon: $lon")

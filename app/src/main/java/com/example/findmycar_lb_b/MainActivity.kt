@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
@@ -30,49 +31,48 @@ class MainActivity : ComponentActivity() {
     private lateinit var databaseHelper: DatabaseHelper
     private lateinit var navigationManager: NavigationManager
 
-
+    // Chat GPT überarbeitet / Tipps bekommen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // ✅ OSMDroid korrekt konfigurieren
         val osmConfig = Configuration.getInstance()
         osmConfig.load(this, getSharedPreferences("osmdroid", MODE_PRIVATE))
         osmConfig.userAgentValue = packageName
 
-        // ✅ SQLite Datenbank initialisieren
         databaseHelper = DatabaseHelper(this)
 
-        // ✅ Standortberechtigung prüfen
         checkLocationPermission()
 
-        // ✅ LocationManager initialisieren
         locationManager = LocationManager(this)
 
         navigationManager = NavigationManager(this)
 
-
+// bei setContent auch mit ChatGPT verbessert
         setContent {
             var showHistory by remember { mutableStateOf(false) }
             var currentLocation by remember { mutableStateOf<GeoPoint?>(null) }
 
-            // 📌 Standort abrufen beim Start
             LaunchedEffect(Unit) {
                 locationManager.getCurrentLocation { latitude, longitude ->
                     currentLocation = GeoPoint(latitude, longitude)
-                    Log.d("DEBUG", "📍 Standort erhalten: Lat=$latitude, Lon=$longitude")
+                    Log.d(
+                        "DEBUG",
+                        "📍 Standort erhalten: Lat=$latitude, Lon=$longitude"
+                    ) //Chatgpt generiert
                 }
             }
 
             Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // 📍 Kartenansicht anzeigen
                 OpenStreetMapView(
                     locationManager = locationManager,
                     onSaveParking = { latitude, longitude ->
                         saveParkingLocation(latitude, longitude)
-                        vibratePhone() // ✅ Vibration auslösen
+                        vibratePhone()
                     },
                     databaseHelper = databaseHelper,
                     currentLocation = currentLocation,
@@ -81,23 +81,24 @@ class MainActivity : ComponentActivity() {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // 📌 Parkplatz speichern Button
+                // Parkplatz speichern
                 Button(
                     onClick = {
                         locationManager.getCurrentLocation { latitude, longitude ->
                             saveParkingLocation(latitude, longitude)
                             vibratePhone()
-                            currentLocation = GeoPoint(latitude, longitude) // Standort aktualisieren
+                            currentLocation = GeoPoint(latitude, longitude)
                         }
                     },
                     modifier = Modifier.padding(8.dp)
                 ) {
                     Text("📍 Parkplatz speichern")
                 }
+                val context = LocalContext.current
                 Button(
                     onClick = {
                         locationManager.getCurrentLocation { latitude, longitude ->
-                            navigationManager.openGoogleMaps(latitude, longitude)
+                            navigationManager.openGoogleMaps(latitude, longitude, context)
                         }
                     },
                     modifier = Modifier.padding(8.dp)
@@ -106,26 +107,32 @@ class MainActivity : ComponentActivity() {
                 }
 
 
-                // 📜 Verlauf anzeigen Button
+                // Verlauf anzeigen
                 Button(
                     onClick = { showHistory = !showHistory },
                     modifier = Modifier.padding(8.dp)
                 ) {
                     Text(if (showHistory) "📜 Verlauf ausblenden" else "📜 Verlauf anzeigen")
                 }
+                //Google Maps weiterleitung
                 Button(
                     onClick = {
                         currentLocation?.let {
-                            navigationManager.openGoogleMaps(it.latitude, it.longitude)
-                        }
+                            Log.d(
+                                "DEBUG",
+                                "✅ Button wurde gedrückt, Standort: ${it.latitude}, ${it.longitude}"
+                            ) // ChatGPt
+                            navigationManager.openGoogleMaps(it.latitude, it.longitude, context)
+                        } ?: Log.e("DEBUG", "❌ currentLocation ist NULL!") // Chatgpt
                     },
-                    modifier = Modifier.padding(8.dp)
+                    modifier = Modifier
+                        .padding(8.dp)
                 ) {
                     Text("🌍 In Google Maps öffnen")
                 }
 
 
-                // 📝 Popup für gespeicherte Parkplätze
+                // Popup Parkplatzhistory
                 if (showHistory) {
                     Box(
                         modifier = Modifier
@@ -154,7 +161,7 @@ class MainActivity : ComponentActivity() {
                                 onClick = { showHistory = false },
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
                             ) {
-                                Text("❌ Verlauf schließen")
+                                Text("Verlauf schließen")
                             }
                         }
                     }
@@ -179,12 +186,16 @@ class MainActivity : ComponentActivity() {
         val sdf = SimpleDateFormat("dd.MM.yy HH:mm", Locale.getDefault())
         val currentDate = sdf.format(Date())
         databaseHelper.saveParkingLocation(latitude, longitude, currentDate)
-        Log.d("DEBUG", "📌 Parkplatz gespeichert: Lat=$latitude, Lon=$longitude am $currentDate")
+        Log.d(
+            "DEBUG",
+            "📌 Parkplatz gespeichert: Lat=$latitude, Lon=$longitude am $currentDate"
+        ) //ChatGPt generier
     }
 
     private fun vibratePhone() {
         val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            val vibratorManager =
+                getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
             vibratorManager.defaultVibrator
         } else {
             @Suppress("DEPRECATION")
