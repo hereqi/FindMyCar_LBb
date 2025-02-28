@@ -1,4 +1,4 @@
-package com.example.findmycar_lb_b
+package com.example.findmycar_lb_b.manager
 
 import android.Manifest
 import android.annotation.SuppressLint

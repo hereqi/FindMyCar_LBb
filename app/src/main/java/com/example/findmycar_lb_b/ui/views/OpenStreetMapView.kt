@@ -1,4 +1,4 @@
-package com.example.findmycar_lb_b
+package com.example.findmycar_lb_b.ui.views
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -14,6 +14,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.example.findmycar_lb_b.db.DatabaseHelper
+import com.example.findmycar_lb_b.manager.LocationManager
+import com.example.findmycar_lb_b.manager.NavigationManager
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView

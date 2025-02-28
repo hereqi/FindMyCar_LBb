@@ -1,4 +1,4 @@
-package com.example.findmycar_lb_b
+package com.example.findmycar_lb_b.db
 
 import android.content.ContentValues
 import android.content.Context

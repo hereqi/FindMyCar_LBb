@@ -1,4 +1,4 @@
-package com.example.findmycar_lb_b
+package com.example.findmycar_lb_b.manager
 
 import android.content.Context
 import android.content.Intent

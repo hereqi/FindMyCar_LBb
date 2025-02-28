@@ -21,6 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.findmycar_lb_b.db.DatabaseHelper
+import com.example.findmycar_lb_b.manager.LocationManager
+import com.example.findmycar_lb_b.manager.NavigationManager
+import com.example.findmycar_lb_b.ui.views.OpenStreetMapView
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import java.text.SimpleDateFormat

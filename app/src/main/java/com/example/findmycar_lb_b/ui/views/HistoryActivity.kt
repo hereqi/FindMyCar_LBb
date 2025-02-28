@@ -1,4 +1,4 @@
-package com.example.findmycar_lb_b
+package com.example.findmycar_lb_b.ui.views
 
 import android.content.Intent
 import android.net.Uri
@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
+import com.example.findmycar_lb_b.db.DatabaseHelper
 
 class HistoryActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
